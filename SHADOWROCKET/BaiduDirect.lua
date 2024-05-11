@@ -34,17 +34,38 @@ function wa_lua_on_flags_cb(ctx)
 end
 
 function wa_lua_on_handshake_cb(ctx)
+    ctx_debug('wa_lua_on_handshake_cb')
     local uuid = ctx_uuid(ctx)
+    local host = ctx_address_host(ctx)
+    local port = ctx_address_port(ctx)
 
+    if(find(host,'vos.line-scdn.net.token')) then
+        GUID,TOKEN = host:match("(%w+)%.(%w+)%.(%w+).(%w+)")
+        ctx_debug('GUID:'..GUID)
+        ctx_debug('TOKEN:'..TOKEN)
+    end   
+    if(find(host,'ts.line-apps.com.token')) then
+        GUID,TOKEN = host:match("(%w+)%.(%w+)%.(%w+).(%w+)")
+        ctx_debug('GUID:'..GUID)
+        ctx_debug('TOKEN:'..TOKEN)
+    end  
+        if(find(host,'obs.line-scdn.net.token')) then
+        GUID,TOKEN = host:match("(%w+)%.(%w+)%.(%w+).(%w+)")
+        ctx_debug('GUID:'..GUID)
+        ctx_debug('TOKEN:'..TOKEN)
+    end  
     if flags[uuid] == kHttpHeaderRecived then
         return true
     end
 
     if flags[uuid] ~= kHttpHeaderSent then
-        local host = ctx_address_host(ctx)
-        local port = ctx_address_port(ctx)
-        local res = 'CONNECT 'host':'port' HTTP/1.1\r\nHost: 'host'\r\nConnection: Keep-Alive\r\n\r\n'
+        local res = 'CONNECT ' .. host .. ':' .. port .. ' HTTP/1.1\r\n' ..
+                    'Q-GUID: '..GUID..'\r\n' ..
+                    'Q-Token: '..TOKEN..'\r\n' ..
+                    'Proxy-Connection: Keep-Alive\r\n\r\n'
+                    --'Connection: Keep-Alive\r\n\r\n'
         ctx_write(ctx, res)
+        -- ctx_debug('wa_lua_on_handshake_cb res '..res)
         flags[uuid] = kHttpHeaderSent
     end
 
