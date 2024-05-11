@@ -1,3 +1,4 @@
+#!url=https://raw.githubusercontent.com/Kyo628/Module/raw/main/SHADOWROCKET/BaiduDirect.lua
 local http = require 'http'
 local backend = require 'backend'
 
